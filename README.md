@@ -1,5 +1,7 @@
 # face_liveness
 
+[![pub package](https://img.shields.io/pub/v/face_liveness.svg)](https://pub.dev/packages/face_liveness)
+
 On-device **face liveness (anti-spoofing) detection** for Flutter. It checks whether the face in front of the camera is real or a presentation attack (printed photo, screen replay, mask) from ordinary camera frames. The user doesn't have to blink or turn their head, and nothing leaves the device.
 
 - Android and iOS
@@ -11,11 +13,15 @@ On-device **face liveness (anti-spoofing) detection** for Flutter. It checks whe
 
 ## Installation
 
+```sh
+flutter pub add face_liveness
+```
+
+or add it to `pubspec.yaml`:
+
 ```yaml
 dependencies:
-  face_liveness:
-    git:
-      url: https://github.com/vishalsgithub/face-liveness-flutter.git
+  face_liveness: ^1.0.0
 ```
 
 **iOS:** add the camera permission text to `ios/Runner/Info.plist`:
