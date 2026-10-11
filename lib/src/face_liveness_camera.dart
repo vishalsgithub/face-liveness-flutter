@@ -86,7 +86,8 @@ class FaceLivenessCamera extends StatefulWidget {
   State<FaceLivenessCamera> createState() => _FaceLivenessCameraState();
 }
 
-class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBindingObserver {
+class _FaceLivenessCameraState extends State<FaceLivenessCamera>
+    with WidgetsBindingObserver {
   CameraController? _controller;
   FaceLiveness? _engine;
   bool _ownsEngine = false;
@@ -107,14 +108,16 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
   void didUpdateWidget(FaceLivenessCamera oldWidget) {
     super.didUpdateWidget(oldWidget);
     _engine?.livenessThreshold = widget.livenessThreshold;
-    if (oldWidget.lensDirection != widget.lensDirection || oldWidget.resolution != widget.resolution) {
+    if (oldWidget.lensDirection != widget.lensDirection ||
+        oldWidget.resolution != widget.resolution) {
       _stopCamera().then((_) => _start());
     }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
       _stopCamera();
     } else if (state == AppLifecycleState.resumed && _controller == null) {
       _start();
@@ -137,14 +140,17 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
         if (widget.engine != null) {
           _engine = widget.engine;
         } else {
-          _engine = await FaceLiveness.create(livenessThreshold: widget.livenessThreshold);
+          _engine = await FaceLiveness.create(
+              livenessThreshold: widget.livenessThreshold);
           _ownsEngine = true;
         }
       }
       _engine!.livenessThreshold = widget.livenessThreshold;
 
       final cameras = await availableCameras();
-      if (cameras.isEmpty) throw CameraException('NoCamera', 'No camera available.');
+      if (cameras.isEmpty) {
+        throw CameraException('NoCamera', 'No camera available.');
+      }
       final camera = cameras.firstWhere(
         (c) => c.lensDirection == widget.lensDirection,
         orElse: () => cameras.first,
@@ -153,7 +159,9 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
         camera,
         widget.resolution,
         enableAudio: false,
-        imageFormatGroup: Platform.isIOS ? ImageFormatGroup.bgra8888 : ImageFormatGroup.yuv420,
+        imageFormatGroup: Platform.isIOS
+            ? ImageFormatGroup.bgra8888
+            : ImageFormatGroup.yuv420,
       );
       await controller.initialize();
       if (!mounted) {
@@ -177,7 +185,9 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
     if (controller == null) return;
     if (mounted) setState(() => _last = null);
     try {
-      if (controller.value.isStreamingImages) await controller.stopImageStream();
+      if (controller.value.isStreamingImages) {
+        await controller.stopImageStream();
+      }
     } catch (_) {}
     await controller.dispose();
   }
@@ -209,7 +219,8 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
     try {
       final rotation = _frameRotation(controller);
       final stopwatch = Stopwatch()..start();
-      final faces = await engine.detectInCameraImage(image, rotationDegrees: rotation);
+      final faces =
+          await engine.detectInCameraImage(image, rotationDegrees: rotation);
       stopwatch.stop();
       if (!mounted || _controller != controller) return;
 
@@ -251,7 +262,8 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
     if (controller == null || !controller.value.isInitialized) {
       return ColoredBox(
         color: Colors.black,
-        child: Center(child: widget.placeholder ?? const CircularProgressIndicator()),
+        child: Center(
+            child: widget.placeholder ?? const CircularProgressIndicator()),
       );
     }
 
@@ -260,7 +272,8 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
     final portrait = MediaQuery.orientationOf(context) == Orientation.portrait;
     final width = portrait ? previewSize.height : previewSize.width;
     final height = portrait ? previewSize.width : previewSize.height;
-    final mirrored = controller.description.lensDirection == CameraLensDirection.front;
+    final mirrored =
+        controller.description.lensDirection == CameraLensDirection.front;
 
     return ClipRect(
       child: FittedBox(
@@ -277,7 +290,9 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
                   painter: _FacePainter(
                     result: _last!,
                     mirrored: mirrored,
-                    color: _last!.face!.isLive ? widget.liveColor : widget.spoofColor,
+                    color: _last!.face!.isLive
+                        ? widget.liveColor
+                        : widget.spoofColor,
                   ),
                 ),
             ],
@@ -289,7 +304,8 @@ class _FaceLivenessCameraState extends State<FaceLivenessCamera> with WidgetsBin
 }
 
 class _FacePainter extends CustomPainter {
-  _FacePainter({required this.result, required this.mirrored, required this.color});
+  _FacePainter(
+      {required this.result, required this.mirrored, required this.color});
 
   final LivenessResult result;
   final bool mirrored;
@@ -304,13 +320,15 @@ class _FacePainter extends CustomPainter {
     var rect = Rect.fromLTRB(face.bounds.left * sx, face.bounds.top * sy,
         face.bounds.right * sx, face.bounds.bottom * sy);
     if (mirrored) {
-      rect = Rect.fromLTRB(size.width - rect.right, rect.top, size.width - rect.left, rect.bottom);
+      rect = Rect.fromLTRB(size.width - rect.right, rect.top,
+          size.width - rect.left, rect.bottom);
     }
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = size.shortestSide / 120;
-    canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(rect.width / 12)), paint);
+    canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, Radius.circular(rect.width / 12)), paint);
   }
 
   @override

@@ -93,9 +93,11 @@ class FaceLivenessException implements Exception {
       case -102:
         return FaceLivenessException(code, 'Invalid liveness model config.');
       case -103:
-        return FaceLivenessException(code, 'Failed to load the face detection model.');
+        return FaceLivenessException(
+            code, 'Failed to load the face detection model.');
       case -104:
-        return FaceLivenessException(code, 'Failed to load the liveness models.');
+        return FaceLivenessException(
+            code, 'Failed to load the liveness models.');
       default:
         return FaceLivenessException(code, 'Engine error $code.');
     }

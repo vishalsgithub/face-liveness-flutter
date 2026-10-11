@@ -21,7 +21,7 @@ or add it to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  face_liveness: ^1.0.0
+  face_liveness: ^1.0.1
 ```
 
 **iOS:** add the camera permission text to `ios/Runner/Info.plist`:
@@ -95,6 +95,7 @@ The C++ engine runs on [ncnn](https://github.com/Tencent/ncnn), and Dart calls i
 
 ## Related packages
 
+- React Native: [@solankivishal/react-native-face-liveness](https://www.npmjs.com/package/@solankivishal/react-native-face-liveness)
 - iOS (Swift Package Manager): [vishalsgithub/face-liveness](https://github.com/vishalsgithub/face-liveness)
 
 ## License

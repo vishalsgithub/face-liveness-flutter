@@ -18,7 +18,9 @@ class LivenessApp extends StatelessWidget {
       title: 'Face Liveness',
       theme: ThemeData(colorSchemeSeed: Colors.teal, useMaterial3: true),
       darkTheme: ThemeData(
-          colorSchemeSeed: Colors.teal, brightness: Brightness.dark, useMaterial3: true),
+          colorSchemeSeed: Colors.teal,
+          brightness: Brightness.dark,
+          useMaterial3: true),
       home: const HomePage(),
     );
   }
@@ -49,8 +51,10 @@ class _HomePageState extends State<HomePage> {
         selectedIndex: _tab,
         onDestinationSelected: (i) => setState(() => _tab = i),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.face_retouching_natural), label: 'Camera'),
-          NavigationDestination(icon: Icon(Icons.photo_outlined), label: 'Photo'),
+          NavigationDestination(
+              icon: Icon(Icons.face_retouching_natural), label: 'Camera'),
+          NavigationDestination(
+              icon: Icon(Icons.photo_outlined), label: 'Photo'),
         ],
       ),
     );
@@ -90,7 +94,8 @@ class _CameraPageState extends State<CameraPage> {
           },
           onVerified: (r) => ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Verified real face (score ${r.face!.livenessScore.toStringAsFixed(3)})'),
+              content: Text(
+                  'Verified real face (score ${r.face!.livenessScore.toStringAsFixed(3)})'),
               duration: const Duration(seconds: 2),
             ),
           ),
@@ -112,7 +117,8 @@ class _CameraPageState extends State<CameraPage> {
           alignment: Alignment.bottomCenter,
           child: Padding(
             padding: const EdgeInsets.all(16),
-            child: _StatusCard(result: _result, error: _error, threshold: _threshold),
+            child: _StatusCard(
+                result: _result, error: _error, threshold: _threshold),
           ),
         ),
       ],
@@ -129,9 +135,11 @@ class _CameraPageState extends State<CameraPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Liveness threshold', style: Theme.of(context).textTheme.titleMedium),
+              Text('Liveness threshold',
+                  style: Theme.of(context).textTheme.titleMedium),
               const SizedBox(height: 4),
-              const Text('Faces scoring at or above the threshold are treated as real. Higher is stricter.'),
+              const Text(
+                  'Faces scoring at or above the threshold are treated as real. Higher is stricter.'),
               Row(
                 children: [
                   Expanded(
@@ -151,7 +159,8 @@ class _CameraPageState extends State<CameraPage> {
               TextButton(
                 onPressed: () {
                   setSheet(() {});
-                  setState(() => _threshold = FaceLiveness.defaultLivenessThreshold);
+                  setState(
+                      () => _threshold = FaceLiveness.defaultLivenessThreshold);
                 },
                 child: const Text('Reset to default (0.915)'),
               ),
@@ -164,7 +173,8 @@ class _CameraPageState extends State<CameraPage> {
 }
 
 class _StatusCard extends StatelessWidget {
-  const _StatusCard({required this.result, required this.error, required this.threshold});
+  const _StatusCard(
+      {required this.result, required this.error, required this.threshold});
 
   final LivenessResult? result;
   final Object? error;
@@ -175,11 +185,31 @@ class _StatusCard extends StatelessWidget {
     final theme = Theme.of(context);
     final face = result?.face;
     final (String title, IconData icon, Color color) = switch (result) {
-      _ when error != null => ('Camera unavailable', Icons.warning_amber, Colors.orange),
-      null => ('Starting camera…', Icons.hourglass_empty, theme.colorScheme.onSurface),
-      LivenessResult(face: null) => ('Position your face in the frame', Icons.face, theme.colorScheme.onSurface),
-      LivenessResult(isVerified: true) => ('Real face', Icons.verified, Colors.green),
-      LivenessResult(face: LivenessFace(isLive: true)) => ('Checking…', Icons.hourglass_top, Colors.blue),
+      _ when error != null => (
+          'Camera unavailable',
+          Icons.warning_amber,
+          Colors.orange
+        ),
+      null => (
+          'Starting camera…',
+          Icons.hourglass_empty,
+          theme.colorScheme.onSurface
+        ),
+      LivenessResult(face: null) => (
+          'Position your face in the frame',
+          Icons.face,
+          theme.colorScheme.onSurface
+        ),
+      LivenessResult(isVerified: true) => (
+          'Real face',
+          Icons.verified,
+          Colors.green
+        ),
+      LivenessResult(face: LivenessFace(isLive: true)) => (
+          'Checking…',
+          Icons.hourglass_top,
+          Colors.blue
+        ),
       _ => ('Spoof detected', Icons.gpp_bad, Colors.red),
     };
 
@@ -196,17 +226,20 @@ class _StatusCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(error?.toString() ?? title,
-                      style: theme.textTheme.titleMedium?.copyWith(color: color)),
+                      style:
+                          theme.textTheme.titleMedium?.copyWith(color: color)),
                 ),
                 if (face != null)
                   Text(face.livenessScore.toStringAsFixed(3),
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontFeatures: const [FontFeature.tabularFigures()])),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                          fontFeatures: const [FontFeature.tabularFigures()])),
               ],
             ),
             const SizedBox(height: 10),
             LinearProgressIndicator(
-              value: result == null ? 0 : (result!.consecutiveLiveFrames / 8).clamp(0.0, 1.0),
+              value: result == null
+                  ? 0
+                  : (result!.consecutiveLiveFrames / 8).clamp(0.0, 1.0),
               color: color,
             ),
             const SizedBox(height: 8),
@@ -276,20 +309,24 @@ class _PhotoPageState extends State<PhotoPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Text('Photo check', style: Theme.of(context).textTheme.headlineSmall),
+            Text('Photo check',
+                style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 16),
             Expanded(
               child: _bytes == null
-                  ? const Center(child: Text('Pick a photo to check it for a real face.'))
+                  ? const Center(
+                      child: Text('Pick a photo to check it for a real face.'))
                   : Center(
                       child: AspectRatio(
-                        aspectRatio: _imageSize == null ? 1 : _imageSize!.aspectRatio,
+                        aspectRatio:
+                            _imageSize == null ? 1 : _imageSize!.aspectRatio,
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
                             Image.memory(_bytes!, fit: BoxFit.fill),
                             if (_imageSize != null)
-                              CustomPaint(painter: _BoxesPainter(_faces, _imageSize!)),
+                              CustomPaint(
+                                  painter: _BoxesPainter(_faces, _imageSize!)),
                           ],
                         ),
                       ),
@@ -329,7 +366,8 @@ class _BoxesPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final sx = size.width / imageSize.width, sy = size.height / imageSize.height;
+    final sx = size.width / imageSize.width,
+        sy = size.height / imageSize.height;
     for (final face in faces) {
       final b = face.bounds;
       canvas.drawRRect(
@@ -345,5 +383,6 @@ class _BoxesPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_BoxesPainter old) => old.faces != faces || old.imageSize != imageSize;
+  bool shouldRepaint(_BoxesPainter old) =>
+      old.faces != faces || old.imageSize != imageSize;
 }

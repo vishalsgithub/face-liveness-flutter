@@ -40,7 +40,8 @@ void main() {
 
   testWidgets('orientation is undone for rotated pixels', (tester) async {
     final (rgba, w, h) = await decodeRgba();
-    final upright = (await engine.detectInPixels(rgba, width: w, height: h)).first;
+    final upright =
+        (await engine.detectInPixels(rgba, width: w, height: h)).first;
 
     // Rotate the pixels 90° counter-clockwise; orientation `right` turns them back.
     final rotated = Uint8List(rgba.length);

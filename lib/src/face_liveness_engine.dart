@@ -67,7 +67,8 @@ class FaceLiveness {
     int numThreads = 2,
   }) {
     _checkNotDisposed();
-    return _worker.request(['options', minFaceSize, faceDetectionThreshold, numThreads]);
+    return _worker
+        .request(['options', minFaceSize, faceDetectionThreshold, numThreads]);
   }
 
   /// Detects faces in raw pixels. Only the largest face is evaluated unless [allFaces].
@@ -95,14 +96,17 @@ class FaceLiveness {
   }
 
   /// Detects faces in an encoded image (JPEG, PNG, ...). EXIF orientation is applied.
-  Future<List<LivenessFace>> detectInImageBytes(Uint8List encoded, {bool allFaces = false}) async {
+  Future<List<LivenessFace>> detectInImageBytes(Uint8List encoded,
+      {bool allFaces = false}) async {
     final codec = await ui.instantiateImageCodec(encoded);
     final frame = await codec.getNextFrame();
     final image = frame.image;
     try {
       final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
-      if (data == null) throw const FaceLivenessException(-101, 'Could not decode the image.');
-      return detectInPixels(
+      if (data == null) {
+        throw const FaceLivenessException(-101, 'Could not decode the image.');
+      }
+      return await detectInPixels(
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
         width: image.width,
         height: image.height,
@@ -115,7 +119,8 @@ class FaceLiveness {
   }
 
   /// Detects faces in an image file (JPEG, PNG, ...).
-  Future<List<LivenessFace>> detectInFile(String path, {bool allFaces = false}) async =>
+  Future<List<LivenessFace>> detectInFile(String path,
+          {bool allFaces = false}) async =>
       detectInImageBytes(await File(path).readAsBytes(), allFaces: allFaces);
 
   /// Detects faces in a frame from `CameraController.startImageStream`.
@@ -150,9 +155,8 @@ class FaceLiveness {
         return _toFaces(result);
       case ImageFormatGroup.nv21:
         final plane = image.planes.first;
-        final bytes = plane.bytesPerRow == image.width
-            ? plane.bytes
-            : _packNv21(image);
+        final bytes =
+            plane.bytesPerRow == image.width ? plane.bytes : _packNv21(image);
         return detectInPixels(bytes,
             width: image.width,
             height: image.height,
@@ -171,7 +175,8 @@ class FaceLiveness {
       default:
         break;
     }
-    throw FaceLivenessException(-101, 'Unsupported camera image format: ${image.format.group}.');
+    throw FaceLivenessException(
+        -101, 'Unsupported camera image format: ${image.format.group}.');
   }
 
   /// Stops the engine and frees native memory.
@@ -191,7 +196,8 @@ class FaceLiveness {
     for (var i = 0; i + 5 < values.length; i += 6) {
       final liveness = values[i + 5];
       faces.add(LivenessFace(
-        bounds: ui.Rect.fromLTRB(values[i], values[i + 1], values[i + 2] + 1, values[i + 3] + 1),
+        bounds: ui.Rect.fromLTRB(
+            values[i], values[i + 1], values[i + 2] + 1, values[i + 3] + 1),
         detectionConfidence: values[i + 4],
         livenessScore: liveness,
         isLive: liveness >= livenessThreshold,
@@ -213,14 +219,20 @@ class FaceLiveness {
 
   /// Copies the bundled models from the package assets to a cache directory (once).
   static Future<String> _prepareModels() async {
-    final dir = Directory('${Directory.systemTemp.path}/face_liveness_models_$_modelsVersion');
+    final dir = Directory(
+        '${Directory.systemTemp.path}/face_liveness_models_$_modelsVersion');
     for (final name in _modelFiles) {
       final file = File('${dir.path}/$name');
-      final data = await rootBundle.load('packages/face_liveness/assets/models/$name');
-      if (file.existsSync() && file.lengthSync() == data.lengthInBytes) continue;
+      final data =
+          await rootBundle.load('packages/face_liveness/assets/models/$name');
+      if (file.existsSync() && file.lengthSync() == data.lengthInBytes) {
+        continue;
+      }
       await file.parent.create(recursive: true);
       final tmp = File('${file.path}.tmp');
-      await tmp.writeAsBytes(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes), flush: true);
+      await tmp.writeAsBytes(
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+          flush: true);
       await tmp.rename(file.path);
     }
     return dir.path;
@@ -248,7 +260,8 @@ class _Worker {
       connection.complete((ReceivePort.fromRawReceivePort(initPort), commands));
     };
     try {
-      await Isolate.spawn(_workerMain, initPort.sendPort, debugName: 'face_liveness');
+      await Isolate.spawn(_workerMain, initPort.sendPort,
+          debugName: 'face_liveness');
     } catch (_) {
       initPort.close();
       rethrow;
@@ -260,7 +273,9 @@ class _Worker {
   }
 
   Future<Object?> request(List<Object?> message) {
-    if (_closed) return Future.error(StateError('FaceLiveness has been disposed.'));
+    if (_closed) {
+      return Future.error(StateError('FaceLiveness has been disposed.'));
+    }
     final id = _nextId++;
     final completer = Completer<Object?>.sync();
     _pending[id] = completer;
@@ -345,14 +360,25 @@ void _workerMain(SendPort mainPort) {
         case 'options':
           bindings.setOptions(engine, m[2] as int, m[3] as double, m[4] as int);
         case 'detect':
-          final bytes = (m[2] as TransferableTypedData).materialize().asUint8List();
+          final bytes =
+              (m[2] as TransferableTypedData).materialize().asUint8List();
           final ptr = ensureBuffer(bytes.length);
           ptr.asTypedList(bytes.length).setAll(0, bytes);
-          final count = bindings.detect(engine, ptr, m[3] as int, m[4] as int, m[5] as int,
-              m[6] as int, m[7] as int, (m[8] as bool) ? 1 : 0, out, _maxFaces);
+          final count = bindings.detect(
+              engine,
+              ptr,
+              m[3] as int,
+              m[4] as int,
+              m[5] as int,
+              m[6] as int,
+              m[7] as int,
+              (m[8] as bool) ? 1 : 0,
+              out,
+              _maxFaces);
           reply = facesOrError(count);
         case 'yuv420':
-          final bytes = (m[2] as TransferableTypedData).materialize().asUint8List();
+          final bytes =
+              (m[2] as TransferableTypedData).materialize().asUint8List();
           final yLength = m[3] as int, uLength = m[4] as int;
           final ptr = ensureBuffer(bytes.length);
           ptr.asTypedList(bytes.length).setAll(0, bytes);

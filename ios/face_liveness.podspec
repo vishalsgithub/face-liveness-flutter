@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'face_liveness'
-  s.version          = '1.0.0'
+  s.version          = '1.0.1'
   s.summary          = 'On-device face liveness (anti-spoofing) detection for Flutter.'
   s.description      = <<-DESC
 Detects faces and checks that they are real (not a photo, screen or mask), fully

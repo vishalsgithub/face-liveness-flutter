@@ -1,9 +1,8 @@
 name: face_liveness
 description: >-
-  On-device face liveness (anti-spoofing) detection for Flutter. Detects whether a face
-  is real or a photo, screen or mask from the camera, using dart:ffi and ncnn.
-  Includes a ready-made camera widget.
-version: 1.0.0
+  On-device face liveness (anti-spoofing) detection for Flutter: a camera widget that
+  tells real faces from photos, screens and masks. Uses dart:ffi and ncnn.
+version: 1.0.1
 homepage: https://github.com/vishalsgithub/face-liveness-flutter
 repository: https://github.com/vishalsgithub/face-liveness-flutter
 issue_tracker: https://github.com/vishalsgithub/face-liveness-flutter/issues
