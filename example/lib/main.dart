@@ -4,6 +4,9 @@ import 'package:face_liveness/face_liveness.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+// Log every 15th camera result: flutter run --dart-define=FACE_LIVENESS_LOG=true
+const bool _logFrames = bool.fromEnvironment('FACE_LIVENESS_LOG');
+
 void main() => runApp(const LivenessApp());
 
 class LivenessApp extends StatelessWidget {
@@ -66,6 +69,7 @@ class CameraPage extends StatefulWidget {
 class _CameraPageState extends State<CameraPage> {
   LivenessResult? _result;
   Object? _error;
+  int _frames = 0;
   double _threshold = FaceLiveness.defaultLivenessThreshold;
 
   @override
@@ -75,7 +79,15 @@ class _CameraPageState extends State<CameraPage> {
       children: [
         FaceLivenessCamera(
           livenessThreshold: _threshold,
-          onResult: (r) => setState(() => _result = r),
+          onResult: (r) {
+            setState(() => _result = r);
+            if (_logFrames && _frames++ % 15 == 0) {
+              // ignore: avoid_print
+              print('face_liveness frame ${r.imageSize.width.toInt()}x'
+                  '${r.imageSize.height.toInt()} ${r.processingTime.inMilliseconds}ms '
+                  '${r.face ?? 'no face'}');
+            }
+          },
           onVerified: (r) => ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Verified real face (score ${r.face!.livenessScore.toStringAsFixed(3)})'),
